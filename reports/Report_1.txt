@@ -1,0 +1,38 @@
+QUESTION 1:
+
+A process which has finished the execution but still has entry in the process table to report to its parent process is known as a
+zombie process. A child process always first becomes a zombie before being removed from the process table. The parent process 
+reads the exit status of the child process which reaps off the child process entry from the process table.
+
+A process whose parent process no more exists i.e. either finished or terminated without waiting for its child process to 
+terminate is called an orphan process. Parent finishes execution and exits while the child process is still executing and is 
+called an orphan process now. However, the orphan process is soon adopted by init process, once its parent process dies.
+
+When a child exits, some process must wait on it to get its exit code. That exit code is stored in the process table until this 
+happens. The act of reading that exit code is called "reaping" the child. Between the time a child exits and is reaped, it is 
+called a zombie. 
+ 
+Zombies only occupy space in the process table. They take no memory or CPU. However, the process table is a finite resource, 
+and excessive zombies can fill it, meaning that no other processes can launch. Beyond that, they are bothersome clutter, and 
+should be strongly avoided.
+
+If a process exits with children still running, those children are orphans. Orphaned children are immediately "adopted" by init. 
+An orphan is just a process. It will use whatever resources it uses. It is reasonable to say that it is not an "orphan" at all 
+since it has a parent, but I've heard them called that often.
+
+Let’s say you have a process P1. Now P1 forks itself, creating a child process P2. Now P1 terminates without waiting for P2 to 
+complete. So P2 is still running, but without it’s parent process. P2 is an orphan. Now consider another process P3. P3 forks 
+itself, creating a child process P4. P4 terminates before P3 does. However, P4’s entry will not be removed from the process table until P3 reads its exit status 
+using the wait() system call. In other words, P4 is undead, a zombie. It needs to be reaped.
+
+
+
+
+QUESTION 2:
+
+The exec family of functions replaces the current process image with a new process image. It loads the program into the current 
+process space and runs it from the entry point. Commonly a process generates a child process because it would like to transform 
+the child process by changing the program code the child process is executing. The text, data and stack segment of the process are replaced and only the u (user) area of the process remains the same. If successful, the exec system calls do not return to the invoking program as the calling image is lost. 
+It is possible for a user at the command line to issue an exec system call, but it takes over the current shell and terminates
+the shell. So, when a child process calls exec(), the control never returns to the original child process until there is an exec() error.
+If the child called fork(), a new process would have started which is a copy of the child process.
